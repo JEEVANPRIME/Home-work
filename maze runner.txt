@@ -1,0 +1,68 @@
+import random
+
+# Define maze symbols
+WALL = '▓'
+OPEN_SPACE = '◌'
+START = 'S'
+END = 'E'
+PATH = '◍'
+
+# Define directions for moving (up, down, left, right)
+directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+def generate_maze(n, wall_prob):
+    # Create an empty maze
+    maze = [[WALL] * n for _ in range(n)]
+
+    # Set start and end points
+    maze[0][0] = START
+    maze[n - 1][n - 1] = END
+
+    # Calculate the number of walls based on the wall probability
+    num_walls = int(n * n * wall_prob)
+
+    # Place random walls in the maze
+    for _ in range(num_walls):
+        x, y = random.randint(0, n - 1), random.randint(0, n - 1)
+        while maze[x][y] != WALL:
+            x, y = random.randint(0, n - 1), random.randint(0, n - 1)
+        maze[x][y] = OPEN_SPACE
+
+    return maze
+
+def print_maze(maze):
+    for row in maze:
+        print(' '.join(row))
+
+def find_path(maze, x, y):
+    if x < 0 or y < 0 or x >= len(maze) or y >= len(maze[0]) or maze[x][y] != OPEN_SPACE:
+        return False
+
+    maze[x][y] = PATH
+
+    if x == len(maze) - 1 and y == len(maze[0]) - 1:
+        return True
+
+    for dx, dy in directions:
+        if find_path(maze, x + dx, y + dy):
+            return True
+
+    maze[x][y] = OPEN_SPACE
+    return False
+
+def main():
+    n = int(input("Enter the size of the maze (n x n): "))
+    wall_prob = float(input("Enter the wall probability (0.0 - 1.0): "))
+
+    maze = generate_maze(n, wall_prob)
+    print("\nGenerated Maze:")
+    print_maze(maze)
+
+    if find_path(maze, 0, 0):
+        print("\nSolution Path:")
+        print_maze(maze)
+    else:
+        print("\nNo solution found.")
+
+if __name__ == "__main__":
+    main()
